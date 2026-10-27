@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Genealogy Mapper</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/d3@7"></script>
+  <link rel="stylesheet" href="https://unpkg.com/family-chart@latest/dist/styles/family-chart.css" />
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-title">
+      <span class="kicker">Genealogy Mapper</span>
+      <h1>Where do the trails meet?</h1>
+    </div>
+
+    <div class="topbar-actions">
+      <span id="saveStatus" class="save-status"></span>
+      <button id="takeTourBtn" class="btn btn-ghost btn-sm" title="A quick, guided tour of what's on screen and what it's for">✨ Take a tour</button>
+      <button id="helpBtn" class="btn btn-ghost btn-sm" title="What this tool is for, and how to get started">? Help</button>
+      <button id="exportJsonBtn" class="btn btn-ghost btn-sm" title="Download the current tree as a JSON file">Export JSON</button>
+      <button id="startOverBtn" class="start-over-btn" hidden>Start over</button>
+      <div id="accountArea" class="account-area">
+        <button id="signInBtn" class="btn btn-account">Sign in</button>
+        <div id="accountChip" class="account-chip" hidden>
+          <button id="myMapsBtn" class="btn btn-account btn-account-sm">My maps</button>
+          <button id="saveMapBtn" class="btn btn-account btn-account-sm btn-account-solid">Save</button>
+          <span id="accountEmail" class="account-email"></span>
+          <button id="signOutBtn" class="account-signout">Sign out</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- A comparison is a named, saved SELECTION of which of the current family trees to
+       look at together (see addComparison in js/model/graph.js) - not a separate
+       project. Its own bar, not folded into the crowded topbar-actions row, because
+       this is meant to read as the app's main call to action, not one more small
+       utility button among Take a tour / Help / Export JSON. -->
+  <div class="comparison-bar">
+    <button type="button" id="createComparisonBtn" class="btn btn-comparison-cta" title="Choose which of your family trees to compare, name it, and save it here to switch back anytime">+ Create a New Comparison</button>
+    <button type="button" id="myComparisonsBtn" class="btn btn-comparison-cta-secondary" title="See and switch between your saved comparisons">My Comparisons</button>
+  </div>
+
+  <main class="app-main">
+    <div class="top-row">
+      <aside class="side-pane">
+        <div class="side-section" id="reviewSection" hidden>
+          <h2>Needs review <span id="reviewCount" class="review-count"></span></h2>
+          <p class="side-hint">People with a note flagging something uncertain, or a name that's still blank - click one to open and fix it.</p>
+          <div id="reviewList"></div>
+        </div>
+
+        <div class="side-section" id="familyTreesSection">
+          <h2>Family trees</h2>
+          <p class="side-hint">Each family tree gets its own color. Start with one per paper trail, split further any time.</p>
+          <p id="importSummary" class="import-summary" hidden></p>
+          <div id="lineageList"></div>
+          <div class="lineage-actions">
+            <button type="button" id="addLineageBtn" class="btn btn-secondary btn-sm">+ New family tree</button>
+            <button type="button" id="saveGroupingBtn" class="btn btn-secondary btn-sm" title="Choose which of your currently-loaded family trees to save together as a named comparison you can switch back to anytime, from &quot;My Comparisons&quot;.">💾 Save this grouping</button>
+          </div>
+          <button type="button" id="findAncestorMatchesBtn" class="btn btn-secondary btn-sm btn-block" title="Immediately compares every family tree you've loaded for people who might be the same ancestor, even spelled or dated a little differently.">🔎 Search for overlapping ancestors</button>
+        </div>
+
+        <div class="side-section" id="trashSection" hidden>
+          <h2>Recently deleted <span id="trashCount" class="review-count"></span></h2>
+          <p class="side-hint">Deleted family trees - and everyone in them - stay here for 30 days before they're gone for good.</p>
+          <div id="trashList"></div>
+        </div>
+
+        <div class="side-section">
+          <h2>Find a person</h2>
+          <p class="side-hint">Everyone in the tree is searchable here, including anyone not yet connected to others or placed on the map.</p>
+          <input type="text" id="peopleSearchInput" placeholder="Search by name…" />
+          <div id="peopleSearchResults"></div>
+        </div>
+
+        <div class="side-section" id="addPeopleSection">
+          <h2>Add people</h2>
+          <button type="button" id="addRootBtn" class="btn btn-primary btn-block">+ Name a starting person</button>
+          <div class="import-buttons">
+            <button type="button" id="openGedcomImportBtn" class="btn btn-secondary btn-block">Import GEDCOM file</button>
+            <button type="button" id="openCsvImportBtn" class="btn btn-secondary btn-block">Import CSV / spreadsheet</button>
+            <button type="button" id="openGridImportBtn" class="btn btn-secondary btn-block">Paste / bulk-enter rows</button>
+          </div>
+          <div id="geocodeProgress" class="geocode-progress" hidden>
+            <span class="geocode-clock" id="geocodeClock">--:--</span>
+            <span class="geocode-progress-text" id="geocodeProgressText"></span>
+          </div>
+          <p id="geocodeCongrats" class="geocode-congrats" hidden></p>
+        </div>
+
+        <p class="side-footnote">Map tiles &amp; place lookup: OpenStreetMap contributors. Tree rendering by <a href="https://github.com/donatso/family-chart" target="_blank" rel="noopener">family-chart</a> (MIT).</p>
+      </aside>
+
+      <div id="treeView" class="view-panel">
+        <span class="panel-label">Family tree</span>
+        <button type="button" id="treeExpandBtn" class="panel-expand-btn" title="Expand family tree">⤢</button>
+        <div class="tree-mode-bar">
+          <div class="tree-mode-toggle">
+            <button type="button" id="treeModeCardsBtn" class="tree-mode-btn" data-mode="cards">Cards</button>
+            <button type="button" id="treeModeFanBtn" class="tree-mode-btn is-active" data-mode="fan">Fan</button>
+          </div>
+          <label id="fanGenerationsRow" class="fan-generations-row">
+            Generations
+            <select id="fanGenerationsSelect">
+              <option value="all">All</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7" selected>7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+            </select>
+          </label>
+          <span id="diagramCount" class="diagram-count" hidden></span>
+        </div>
+        <div id="emptyState" class="empty-state-pane">
+          <p>Upload a <a href="#" id="emptyStateGedcomLink">GEDCOM file</a>, or <a href="#" id="emptyStateHandLink">fill in your tree by hand</a> - or click the shape below to name your first person.</p>
+          <button id="startSampleBtn" class="btn btn-ghost sample-data-btn">Or see a guided walkthrough with sample data →</button>
+          <button type="button" id="replayOnboardingBtn" class="replay-onboarding-btn">New here? Replay the intro</button>
+        </div>
+        <div id="FamilyChart" class="f3 f3-cont"></div>
+        <div id="fanChartContainer" class="fan-chart-container" hidden></div>
+        <div class="viewport-hint">Drag to pan · Scroll to zoom · Click any card to open their details</div>
+      </div>
+    </div>
+
+    <!-- Per-lineage geocoding status, so it's obvious BEFORE trusting the map below
+         whether every family tree's places have actually finished loading, or some are
+         still pending/vague - see renderMapReadiness in main.js. -->
+    <section id="mapReadinessSection" class="map-readiness-row">
+      <h2>Ready to map?</h2>
+      <p class="side-hint" id="mapReadinessSummary"></p>
+      <div id="mapReadinessList"></div>
+    </section>
+
+    <div id="mapView" class="view-panel map-row">
+      <span class="panel-label">Map &amp; timeline</span>
+      <!-- Live, always-on-the-map summary of every person across every loaded family
+           tree and how much of the mapping work is actually done - see
+           updateMapStatusBadge in main.js. Updates during a geocoding pass (not just at
+           the start/end), so it's a real place to watch a run to completion instead of
+           guessing from a sidebar clock. -->
+      <div id="mapStatusBadge" class="map-status-badge" hidden></div>
+      <button type="button" id="mapRefreshBtn" class="map-refresh-btn" title="Refresh the map with the latest data, and re-check anything still pending">🔄 Refresh map data</button>
+      <button type="button" id="mapExpandBtn" class="panel-expand-btn" title="Expand map">⤢</button>
+      <div id="mapContainer" class="map-container"></div>
+      <div class="timeline-bar">
+        <button type="button" id="timelinePlayBtn" class="btn btn-secondary btn-sm" title="Play through time">▶</button>
+        <span id="timelineYearLabel" class="timeline-year">—</span>
+        <input type="range" id="timelineSlider" class="timeline-slider" min="0" max="1" value="1" />
+        <button type="button" id="timelineResetBtn" class="btn btn-ghost btn-sm" title="Show everyone, ignore time">Show all</button>
+      </div>
+    </div>
+
+    <section class="overlaps-row">
+      <div class="overlaps-row-header">
+        <div>
+          <h2>Possible overlaps</h2>
+          <p class="side-hint">Times and places where people from different family trees could have been together - widened to cover the gap between two known dates, since we rarely know the exact day someone moved on.</p>
+        </div>
+        <button type="button" id="reviewBroadLocationsBtn" class="btn btn-secondary btn-sm" hidden></button>
+      </div>
+      <div class="overlap-section-label">Specific Collisions in Space and Time (Citywide)</div>
+      <div id="overlapCityList" class="overlap-list"></div>
+      <div class="overlap-section-label">General Collisions (Statewide)</div>
+      <div id="overlapBroadList" class="overlap-list"></div>
+    </section>
+  </main>
+
+  <!-- Lightbox: houses whichever of #treeView / #mapView is currently expanded - the
+       real panel element is moved in here (not cloned), so the live map/tree instance
+       keeps working, and moved back on close. -->
+  <div id="panelLightbox" class="panel-lightbox" hidden>
+    <button type="button" id="panelLightboxCloseBtn" class="panel-lightbox-close" title="Close (Esc)">✕ Close</button>
+    <div id="panelLightboxContent" class="panel-lightbox-content"></div>
+  </div>
+
+  <!-- Person editor -->
+  <dialog id="personDialog" class="person-dialog person-menu-dialog">
+    <div class="person-menu-name">
+      <input type="text" id="pName" placeholder="Name" />
+      <div id="pSexToggle" class="sex-toggle" role="group" aria-label="Sex">
+        <button type="button" class="sex-btn" data-sex="U" title="Unspecified">—</button>
+        <button type="button" class="sex-btn" data-sex="M" title="Male">M</button>
+        <button type="button" class="sex-btn" data-sex="F" title="Female">F</button>
+      </div>
+    </div>
+
+    <div id="pLocationReviewBar" class="review-banner location-review-banner" hidden>
+      <span class="review-banner-label">Adding city detail</span>
+      <p id="pLocationReviewCount"></p>
+      <div class="location-review-actions">
+        <button type="button" id="pLocationReviewNextBtn" class="btn btn-secondary btn-sm">Next →</button>
+        <button type="button" id="pLocationReviewDoneBtn" class="btn btn-ghost btn-sm">Done reviewing</button>
+      </div>
+    </div>
+
+    <div id="pReviewBanner" class="review-banner" hidden>
+      <span class="review-banner-label">Needs review</span>
+      <p id="pReviewBannerText"></p>
+      <button type="button" id="pResolveReviewBtn" class="btn btn-secondary btn-sm">✓ Looks good — clear this flag</button>
+    </div>
+
+    <label>
+      Family tree (color)
+      <select id="pLineage"></select>
+    </label>
+
+    <div class="menu-section">
+      <div class="menu-section-label">Birth</div>
+      <div class="form-row">
+        <input type="text" id="pBirthDate" placeholder="Date (e.g. 1850 or 12 Jan 1850)" />
+        <input type="text" id="pBirthPlace" placeholder="Place (e.g. Cork, Ireland)" />
+      </div>
+      <p id="pBirthGeoStatus" class="geo-status"></p>
+      <div id="pBirthMap" class="mini-map"></div>
+    </div>
+
+    <div class="menu-section">
+      <div class="menu-section-label">Death</div>
+      <div class="form-row">
+        <input type="text" id="pDeathDate" placeholder="Date (e.g. 1920 or 1920)" />
+        <input type="text" id="pDeathPlace" placeholder="Place" />
+      </div>
+      <p id="pDeathGeoStatus" class="geo-status"></p>
+      <div id="pDeathMap" class="mini-map"></div>
+    </div>
+
+    <div class="menu-section">
+      <div class="menu-section-label">Other places lived</div>
+      <p class="side-hint">If they moved, add each date and place - shown on the map as its own stop along their life.</p>
+      <div id="pEventsList"></div>
+      <button type="button" id="pAddEventBtn" class="btn btn-secondary btn-sm">+ Add a date &amp; place</button>
+    </div>
+
+    <div class="menu-section">
+      <div class="menu-section-label">Family</div>
+      <div class="menu-btn-row">
+        <button type="button" id="pAddParentsBtn" class="btn btn-secondary">+ Parent</button>
+        <button type="button" id="pAddSpouseBtn" class="btn btn-secondary">+ Spouse</button>
+        <button type="button" id="pAddChildBtn" class="btn btn-secondary">+ Child</button>
+      </div>
+    </div>
+
+    <div class="menu-section danger-zone">
+      <span></span>
+      <button type="button" id="pDeleteBtn" class="btn btn-ghost btn-danger">Delete person</button>
+    </div>
+
+    <div class="dialog-actions">
+      <span id="pSaveStatus" class="dialog-save-status"></span>
+      <button type="button" id="pCloseBtn" class="btn btn-primary">Done</button>
+    </div>
+  </dialog>
+
+  <!-- GEDCOM import -->
+  <dialog id="gedcomImportDialog" class="person-dialog">
+    <h3>Import GEDCOM file</h3>
+    <p class="signin-copy">Exported from Ancestry, FamilySearch, MyHeritage, or almost any other genealogy program (usually File → Export → GEDCOM). This covers names, sex, birth/death dates &amp; places, and family links.</p>
+    <div class="form-row">
+      <input type="file" id="gedcomFileInput" accept=".ged,.gedcom,text/plain" />
+    </div>
+    <div id="gedcomScopeSection" hidden>
+      <div class="form-row">
+        <label class="check-row"><input type="checkbox" id="gedcomAncestorsOnly" checked /> Only bring in direct ancestors (no siblings, no other branches)</label>
+      </div>
+      <div id="gedcomRootPickerRow">
+        <label>
+          Root person
+          <input type="text" id="gedcomRootSearch" placeholder="Search by name…" />
+        </label>
+        <div id="gedcomRootResults" class="gedcom-root-results"></div>
+        <p id="gedcomRootSelected" class="side-hint" hidden></p>
+      </div>
+    </div>
+    <label>
+      Import into
+      <select id="gedcomLineageSelect"></select>
+    </label>
+    <p id="gedcomImportMessage" class="signin-message" hidden></p>
+    <div class="dialog-actions">
+      <button type="button" id="gedcomImportCancelBtn" class="btn btn-ghost">Cancel</button>
+      <button type="button" id="gedcomImportBtn" class="btn btn-primary" disabled>Import</button>
+    </div>
+  </dialog>
+
+  <!-- CSV import -->
+  <dialog id="csvImportDialog" class="person-dialog csv-dialog">
+    <h3>Import CSV / spreadsheet</h3>
+    <p class="signin-copy">Export your spreadsheet as CSV, upload it, then tell us which column is which. First row should be headers.</p>
+    <div class="form-row">
+      <input type="file" id="csvFileInput" accept=".csv,text/csv" />
+    </div>
+    <div id="csvMappingArea"></div>
+    <label>
+      Import into
+      <select id="csvLineageSelect"></select>
+    </label>
+    <p id="csvImportMessage" class="signin-message" hidden></p>
+    <div class="dialog-actions">
+      <button type="button" id="csvImportCancelBtn" class="btn btn-ghost">Cancel</button>
+      <button type="button" id="csvImportBtn" class="btn btn-primary" disabled>Import</button>
+    </div>
+  </dialog>
+
+  <!-- Bulk paste grid -->
+  <dialog id="gridImportDialog" class="person-dialog grid-dialog">
+    <h3>Bulk entry grid</h3>
+    <p class="signin-copy">Type rows directly, or click a cell and paste rows copied from Excel/Google Sheets. Give each row an ID, then use it in Father ID / Mother ID to link generations.</p>
+    <div class="grid-scroll">
+      <table id="bulkGridTable" class="bulk-grid">
+        <thead>
+          <tr>
+            <th>ID</th><th>Name</th><th>Sex</th><th>Birth date</th><th>Birth place</th><th>Death date</th><th>Death place</th><th>Father ID</th><th>Mother ID</th><th>Notes</th>
+          </tr>
+        </thead>
+        <tbody id="bulkGridBody"></tbody>
+      </table>
+    </div>
+    <button type="button" id="gridAddRowBtn" class="btn btn-secondary btn-sm">+ Add row</button>
+    <label>
+      Import into
+      <select id="gridLineageSelect"></select>
+    </label>
+    <p id="gridImportMessage" class="signin-message" hidden></p>
+    <div class="dialog-actions">
+      <button type="button" id="gridImportCancelBtn" class="btn btn-ghost">Cancel</button>
+      <button type="button" id="gridImportBtn" class="btn btn-primary">Import rows</button>
+    </div>
+  </dialog>
+
+  <!-- New root person -->
+  <dialog id="rootDialog" class="person-dialog">
+    <h3>Name a starting person</h3>
+    <p class="signin-copy">A real, living (or recently living) person whose ancestor family tree you'll build. They'll get their own color.</p>
+    <div class="form-row">
+      <input type="text" id="rootName" placeholder="Their name" required />
+    </div>
+    <div class="dialog-actions">
+      <button type="button" id="rootCancelBtn" class="btn btn-ghost">Cancel</button>
+      <button type="button" id="rootCreateBtn" class="btn btn-primary">Create</button>
+    </div>
+  </dialog>
+
+  <!-- Shown right after a bulk import (GEDCOM/CSV/paste-grid) if there's enough
+       pending geocoding for the wait to actually matter - see maybeShowGeocodeNotice
+       in main.js. Purely informational: dismissing it doesn't pause or affect the
+       geocoding pass, which is already running in the background underneath it. -->
+  <dialog id="geocodeNoticeDialog" class="person-dialog">
+    <h3>Adding places to the map</h3>
+    <p class="signin-copy" id="geocodeNoticeMessage"></p>
+    <div class="geocode-progress">
+      <span class="geocode-clock" id="geocodeNoticeClock">--:--</span>
+      <span class="geocode-progress-text" id="geocodeNoticeProgress"></span>
+    </div>
+    <div class="dialog-actions">
+      <button type="button" id="geocodeNoticeOkBtn" class="btn btn-primary">Got it</button>
+    </div>
+  </dialog>
+
+  <!-- Offered right after an import finishes geocoding, only if some of the people just
+       added only resolved to a state/county/country-level place - see maybePromptForLocationDetail
+       in main.js. -->
+  <dialog id="locationPrecisionDialog" class="person-dialog">
+    <h3>Add more specific locations?</h3>
+    <p class="signin-copy" id="locationPrecisionMessage"></p>
+    <div class="dialog-actions">
+      <button type="button" id="locationPrecisionSkipBtn" class="btn btn-ghost">Continue with general mapping</button>
+      <button type="button" id="locationPrecisionWalkBtn" class="btn btn-primary">Walk me through them</button>
+    </div>
+  </dialog>
+
+  <dialog id="signInDialog" class="person-dialog signin-dialog">
+    <h3>Sign in</h3>
+    <button type="button" id="googleSignInBtn" class="btn-google">
+      <svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true">
+        <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.91c1.7-1.57 2.69-3.88 2.69-6.62z"/>
+        <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.91-2.26c-.81.54-1.85.86-3.05.86-2.34 0-4.32-1.58-5.03-3.71H.96v2.33A9 9 0 0 0 9 18z"/>
+        <path fill="#FBBC05" d="M3.97 10.71A5.4 5.4 0 0 1 3.68 9c0-.59.1-1.17.28-1.71V4.96H.96A9 9 0 0 0 0 9c0 1.45.35 2.83.96 4.04l3.01-2.33z"/>
+        <path fill="#EA4335" d="M9 3.58c1.32 0 2.51.46 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .96 4.96l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"/>
+      </svg>
+      Continue with Google
+    </button>
+    <div class="signin-divider"><span>or</span></div>
+    <form id="signInForm">
+      <p class="signin-copy">We'll email you a link — no password to remember.</p>
+      <div class="form-row">
+        <input type="email" id="signInEmail" placeholder="you@example.com" required autocomplete="email" />
+      </div>
+      <p id="signInMessage" class="signin-message" hidden></p>
+      <div class="dialog-actions">
+        <button type="button" id="signInCancelBtn" class="btn btn-ghost">Cancel</button>
+        <button type="submit" id="signInSubmitBtn" class="btn btn-primary">Send magic link</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="onboardingDialog" class="person-dialog">
+    <h3>Where do the trails meet?</h3>
+    <p class="signin-copy">Genealogy Mapper plots separate paper-trail ancestries - each its own color - on a shared map and timeline, so you can spot the times and places where people from different family trees could plausibly have crossed paths.</p>
+    <div class="onboarding-steps">
+      <div class="onboarding-step">
+        <strong>1. Add a family tree</strong>
+        <span>One color per paper trail you're following - split it further into more family trees any time.</span>
+      </div>
+      <div class="onboarding-step">
+        <strong>2. Add people</strong>
+        <span>Upload a GEDCOM file, paste rows from a spreadsheet, or fill people in by hand - birth, death, and any other places lived.</span>
+      </div>
+      <div class="onboarding-step">
+        <strong>3. Watch the map</strong>
+        <span>Play through time and see when two different family trees' dots land in the same place at once - a possible lead worth checking.</span>
+      </div>
+    </div>
+    <div class="dialog-actions onboarding-actions">
+      <button type="button" id="onboardingSkipBtn" class="btn btn-ghost">I'll add my own people</button>
+      <button type="button" id="onboardingWalkthroughBtn" class="btn btn-primary">See a guided walkthrough with sample data</button>
+    </div>
+  </dialog>
+
+  <dialog id="saveMapDialog" class="person-dialog">
+    <form id="saveMapForm">
+      <h3>Save this map</h3>
+      <p class="signin-copy">Give it a name so you can find it again under "My maps".</p>
+      <div class="form-row">
+        <input type="text" id="saveMapName" placeholder="e.g. Smith &amp; Doyle family trees" required />
+      </div>
+      <p id="saveMapMessage" class="signin-message" hidden></p>
+      <div class="dialog-actions">
+        <button type="button" id="saveMapCancelBtn" class="btn btn-ghost">Cancel</button>
+        <button type="submit" id="saveMapSubmitBtn" class="btn btn-primary">Save to cloud</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="myMapsDialog" class="person-dialog trees-dialog">
+    <h3>My maps</h3>
+    <button type="button" id="newMapBtn" class="btn btn-secondary trees-new-btn">+ New map</button>
+    <div id="myMapsList"></div>
+    <div class="dialog-actions">
+      <button type="button" id="myMapsCloseBtn" class="btn btn-primary">Close</button>
+    </div>
+  </dialog>
+
+  <!-- Create/save a comparison: pick which currently-loaded family trees to look at
+       together, name that selection, save it. Reused for both the topbar's big "+
+       Create a New Comparison" (opens with every tree pre-checked) and the sidebar's
+       "Save this grouping" (opens with whatever's currently visible/included
+       pre-checked) - see openComparisonDialog in main.js. -->
+  <dialog id="comparisonDialog" class="person-dialog trees-dialog">
+    <h3>Create a comparison</h3>
+    <p class="signin-copy">Choose which family trees to compare, then name it so you can switch back to this exact combination anytime.</p>
+    <div id="comparisonLineageChecklist" class="comparison-checklist"></div>
+    <div class="form-row">
+      <input type="text" id="comparisonNameInput" placeholder="e.g. Smith &amp; Jones comparison" />
+    </div>
+    <p id="comparisonDialogMessage" class="signin-message" hidden></p>
+    <div class="dialog-actions">
+      <button type="button" id="comparisonCancelBtn" class="btn btn-ghost">Cancel</button>
+      <button type="button" id="comparisonSaveBtn" class="btn btn-primary">Save comparison</button>
+    </div>
+  </dialog>
+
+  <dialog id="myComparisonsDialog" class="person-dialog trees-dialog">
+    <h3>My Comparisons</h3>
+    <button type="button" id="newComparisonFromDialogBtn" class="btn btn-secondary trees-new-btn">+ New comparison</button>
+    <div id="myComparisonsList"></div>
+    <div class="dialog-actions">
+      <button type="button" id="myComparisonsCloseBtn" class="btn btn-primary">Close</button>
+    </div>
+  </dialog>
+
+  <!-- Results of the "same ancestor, spelled/dated differently" search - see
+       findOverlappingAncestors in model/ancestorMatch.js and its wiring in main.js.
+       Different question from the map's own "Possible overlaps" section (different
+       people, same place/time); this looks for ONE person recorded two ways across the
+       family trees currently turned on. -->
+  <dialog id="ancestorMatchDialog" class="person-dialog trees-dialog">
+    <h3>Overlapping ancestors</h3>
+    <p class="signin-copy" id="ancestorMatchIntro"></p>
+    <div id="ancestorMatchList"></div>
+    <div class="dialog-actions">
+      <button type="button" id="ancestorMatchCloseBtn" class="btn btn-primary">Close</button>
+    </div>
+  </dialog>
+
+  <!-- Guided tour - a spotlight cutout (tourHighlightBox) plus a callout, both
+       position:fixed and placed in JS against whatever element the current step
+       targets (see TOUR_STEPS in main.js). No separate dimming layer needed: the
+       highlight box's own huge box-shadow spread darkens everything else. -->
+  <div id="tourOverlay" class="tour-overlay" hidden>
+    <div id="tourHighlightBox" class="tour-highlight-box"></div>
+    <div id="tourCallout" class="tour-callout">
+      <div class="tour-callout-step" id="tourStepLabel"></div>
+      <h3 id="tourTitle"></h3>
+      <div id="tourPreview" class="tour-preview" hidden></div>
+      <p id="tourBody"></p>
+      <div class="tour-callout-actions">
+        <button type="button" id="tourSkipBtn" class="btn btn-ghost btn-sm">Skip</button>
+        <button type="button" id="tourNextBtn" class="btn btn-primary btn-sm">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="https://unpkg.com/family-chart@latest"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

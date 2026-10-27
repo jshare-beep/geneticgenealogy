@@ -1,0 +1,749 @@
+/* --- Dialogs --------------------------------------------------------------- */
+
+dialog.person-dialog {
+  border: none;
+  border-radius: var(--radius);
+  padding: 20px;
+  width: min(480px, 92vw);
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+}
+dialog.person-dialog::backdrop { background: rgba(20,17,12,0.45); }
+dialog.person-dialog h3 { margin-top: 0; }
+
+.form-row { display: flex; gap: 8px; margin-bottom: 10px; }
+.form-row input, .form-row select { flex: 1; min-width: 0; }
+
+/* Flagged by advanceLocationReview (main.js) - this specific field is the one that
+   only resolved to a state/county/country-level place, so it's the one worth typing a
+   closer city into during a location-detail review pass. */
+.form-row input.needs-city { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(196, 165, 36, 0.25); }
+
+.person-menu-name { display: flex; gap: 8px; margin-bottom: 10px; }
+.person-menu-name input { flex: 1; font-size: 1.05rem; font-weight: 600; }
+
+.sex-toggle {
+  display: flex; gap: 2px; align-items: center;
+  background: var(--bg-elevated-2); border: 1px solid var(--border); border-radius: 8px; padding: 2px;
+}
+.sex-btn {
+  border: none; background: transparent; border-radius: 6px;
+  min-width: 2.1em; padding: 6px 0; font-size: 0.9rem; font-weight: 600; color: var(--text-muted);
+}
+.sex-btn.is-active { background: var(--accent); color: var(--hawthorn-blossom); }
+
+dialog.person-dialog label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+dialog.person-dialog label > input,
+dialog.person-dialog label > select,
+dialog.person-dialog label > textarea {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  font-size: 0.92rem;
+  color: var(--text);
+}
+.check-row { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; }
+.check-row input { width: auto; }
+
+.menu-section {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  margin-top: 12px;
+}
+.menu-section-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.menu-btn-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.danger-zone { display: flex; justify-content: flex-end; }
+
+.geo-status { font-size: 0.74rem; color: var(--text-muted); margin: 4px 0 0 0; }
+.geo-status.is-ok { color: var(--ivy-bloom); }
+.geo-status.is-failed { color: var(--badge-red); }
+.geo-status.is-pending { color: var(--gold); }
+/* A borrowed-from-a-relative guess, not a real geocode - same green family as is-ok
+   (it did resolve to a usable city-level point) but italic, so it still visually reads
+   as "worth a glance" rather than settled fact. */
+.geo-status.is-inferred { color: var(--ivy-bloom); font-style: italic; }
+
+.event-row { border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px; }
+.event-row:first-child { border-top: none; padding-top: 0; margin-top: 0; }
+
+.mini-map { margin-top: 6px; }
+.mini-map-canvas {
+  height: 150px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated-2);
+  cursor: crosshair;
+}
+.mini-map-hint { font-size: 0.7rem; color: var(--text-muted); margin: 4px 0 0; }
+.event-fields-row { display: flex; gap: 6px; align-items: center; margin-bottom: 0; }
+.event-fields-row input { flex: 1; min-width: 0; }
+.event-remove {
+  flex: 0 0 auto; border: none; background: transparent; color: var(--text-muted);
+  padding: 4px 6px; font-size: 0.95rem; line-height: 1;
+}
+.event-remove:hover { color: var(--badge-red); }
+
+.possibility-flag { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; font-size: 0.86rem; }
+
+.dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+
+.onboarding-steps { display: flex; flex-direction: column; gap: 10px; margin: 16px 0; }
+.onboarding-step { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; background: var(--bg-elevated); border-radius: 10px; }
+.onboarding-step strong { font-size: 0.86rem; }
+.onboarding-step span { font-size: 0.8rem; color: var(--text-muted); }
+.onboarding-actions { justify-content: space-between; }
+
+.signin-copy { font-size: 0.85rem; color: var(--text-muted); }
+.signin-message { font-size: 0.82rem; color: var(--badge-red); }
+
+/* Shared by the sidebar's own live status (under "Add people") and the geocode notice
+   dialog's progress row - same clock+count pairing in both places. */
+.geocode-progress { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.geocode-clock {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--accent-strong);
+  background: var(--bg-elevated-2);
+  border-radius: 6px;
+  padding: 2px 8px;
+  flex-shrink: 0;
+}
+.geocode-progress-text { font-size: 0.78rem; color: var(--text-muted); }
+.geocode-congrats { font-size: 0.85rem; color: var(--ivy-bloom); font-weight: 600; margin: 8px 0 0; }
+
+/* One row per family tree in the "Ready to map?" status section (see .map-readiness-row
+   in layout.css) - a compact status line, mostly read-only, except that a "vague/
+   couldn't be found" row also gets its own .readiness-fix-btn (below) so the complaint
+   isn't a dead end. */
+.readiness-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+.readiness-row:last-child { border-bottom: none; }
+.readiness-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.readiness-name { font-weight: 600; flex: 0 0 auto; min-width: 200px; }
+.readiness-people-count { font-weight: 400; color: var(--text-muted); font-size: 0.8em; }
+.readiness-status { flex: 1; min-width: 0; }
+.readiness-status.is-ready { color: var(--ivy-bloom); }
+.readiness-status.is-pending { color: var(--gold); }
+.readiness-status.is-vague { color: var(--copper-beech); }
+.readiness-status.is-empty { color: var(--text-muted); }
+
+/* Turns a "some places are only vague" complaint into something actionable right where
+   it's reported - opens the same one-at-a-time "add a specific city" review the
+   tree-wide "Add city detail to N vague locations" button (under Possible overlaps)
+   already offers, just scoped to this one lineage's own people (see the click handler
+   in renderMapReadiness). */
+.readiness-fix-btn {
+  flex-shrink: 0;
+  border: 1px solid var(--copper-beech);
+  background: transparent;
+  color: var(--copper-beech);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.readiness-fix-btn:hover { background: var(--copper-beech); color: var(--hawthorn-blossom); }
+
+/* Sits right in the "Family trees" sidebar section, right below the intro hint - a
+   persistent (not auto-hiding, see showImportSummary in main.js) confirmation of what
+   the most recent GEDCOM/CSV/rows import actually did, dismissed with its own "x" once
+   read rather than on a timer. */
+.import-summary {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  background: var(--bg-elevated-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin: 0 0 12px;
+}
+.import-summary span { flex: 1; }
+.import-summary-dismiss {
+  flex-shrink: 0;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+  line-height: 1;
+  padding: 2px;
+}
+.import-summary-dismiss:hover { color: var(--text); }
+
+/* Next to the Fan chart's own Generations picker - how many of the lineage's people
+   actually landed inside the current root+generation-limit slice, since the fan view
+   only ever shows one person's direct ancestor line (see buildAhnentafel in
+   model/ahnentafel.js), never the whole lineage roster the sidebar count refers to. */
+.diagram-count {
+  font-size: 0.7rem;
+  color: var(--canvas-text-muted);
+  background: rgba(249, 248, 244, 0.85);
+  border-radius: 999px;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+.signin-divider { text-align: center; color: var(--text-muted); font-size: 0.78rem; margin: 10px 0; }
+.btn-google {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; padding: 9px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--hawthorn-blossom); font-size: 0.9rem; font-weight: 600;
+}
+
+.trees-dialog { max-height: 80vh; overflow-y: auto; }
+.trees-new-btn { margin-bottom: 12px; }
+.tree-list-item { display: flex; align-items: center; gap: 6px; border-bottom: 1px solid var(--border); padding: 6px 0; }
+.tree-list-main { flex: 1; display: flex; justify-content: space-between; background: none; border: none; text-align: left; padding: 6px; border-radius: 6px; }
+.tree-list-main:hover { background: var(--bg-elevated-2); }
+.tree-list-name { font-weight: 600; }
+.tree-list-updated { color: var(--text-muted); font-size: 0.78rem; }
+
+.node-btn-icon { border: none; background: transparent; padding: 4px 8px; border-radius: 6px; }
+.node-btn-danger { color: var(--badge-red); }
+
+.comparison-checklist {
+  max-height: 240px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px 8px;
+  margin: 10px 0;
+}
+.comparison-checklist-row { display: flex; align-items: center; gap: 8px; padding: 6px 4px; cursor: pointer; }
+.comparison-checklist-swatch { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.tree-list-updated.comparison-list-lineages { white-space: normal; text-align: right; max-width: 55%; }
+
+.ancestor-match-row { border-bottom: 1px solid var(--border); padding: 8px 4px; }
+.ancestor-match-pair { display: flex; align-items: center; gap: 8px; }
+.ancestor-match-person {
+  flex: 1; display: flex; align-items: center; gap: 6px;
+  background: none; border: none; text-align: left;
+  padding: 4px 6px; border-radius: 6px; min-width: 0;
+}
+.ancestor-match-person:hover { background: var(--bg-elevated-2); }
+.ancestor-match-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.ancestor-match-name-years { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ancestor-match-name { font-weight: 600; }
+.ancestor-match-years { color: var(--text-muted); font-size: 0.78rem; }
+.ancestor-match-vs { color: var(--text-muted); font-size: 0.72rem; flex-shrink: 0; }
+.ancestor-match-reason { color: var(--text-muted); font-size: 0.72rem; margin: 4px 0 0; padding-left: 6px; }
+
+/* --- Lineage list ------------------------------------------------------- */
+
+.lineage-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 4px; border-radius: 8px;
+}
+.lineage-row:hover { background: var(--bg-elevated-2); }
+.lineage-swatch-wrap { position: relative; flex-shrink: 0; }
+.lineage-swatch-btn {
+  width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.15);
+  padding: 0; cursor: pointer; display: block;
+}
+.lineage-color-popover {
+  position: absolute; top: calc(100% + 6px); left: 0; z-index: 5;
+  display: grid; grid-template-columns: repeat(4, auto); gap: 6px;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+  padding: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+}
+/* `[hidden]` and `.lineage-color-popover` are equal specificity, and this stylesheet
+   loads after the UA one - without this, `display: grid` above wins and the popover
+   stays visible even while its `hidden` attribute is set. */
+.lineage-color-popover[hidden] { display: none; }
+.lineage-color-dot {
+  width: 20px; height: 20px; border-radius: 50%; border: 2px solid transparent;
+  padding: 0; cursor: pointer;
+}
+.lineage-color-dot:hover { transform: scale(1.12); }
+.lineage-color-dot.is-selected { border-color: var(--text); }
+.lineage-name-input {
+  flex: 1; border: none; background: transparent; font-size: 0.88rem; padding: 4px 2px; min-width: 0;
+}
+.lineage-name-input:focus { background: var(--bg-elevated-2); border-radius: 4px; }
+.lineage-count { font-size: 0.72rem; color: var(--text-muted); white-space: nowrap; }
+
+/* Pill toggle for map/timeline visibility, colored with --toggle-color (set inline per
+   row to that family tree's own swatch color - see renderLineageList) instead of the
+   browser's native checkbox blue. The real checkbox stays functional underneath,
+   stretched over the whole pill and just made invisible - screen readers and keyboard
+   focus still see a normal checkbox, only the paint is custom. */
+.lineage-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 30px;
+  height: 18px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.lineage-visibility {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.lineage-toggle-track {
+  position: absolute;
+  inset: 0;
+  background: var(--border);
+  border-radius: 999px;
+  transition: background-color 0.15s ease;
+}
+.lineage-toggle-track::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--bg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease;
+}
+.lineage-visibility:checked + .lineage-toggle-track { background: var(--toggle-color, var(--accent)); }
+.lineage-visibility:checked + .lineage-toggle-track::before { transform: translateX(12px); }
+.lineage-visibility:focus-visible + .lineage-toggle-track { outline: 2px solid var(--toggle-color, var(--accent)); outline-offset: 2px; }
+.lineage-overlap-btn { border: none; background: transparent; padding: 2px 4px; font-size: 0.9rem; opacity: 0.85; }
+.lineage-overlap-btn:hover { opacity: 1; }
+.lineage-overlap-btn.is-off { opacity: 0.3; filter: grayscale(1); }
+.lineage-remove {
+  border: none; background: transparent; color: var(--text-muted); padding: 2px 6px;
+  border-radius: 6px; font-size: 0.9rem;
+}
+.lineage-remove:hover { color: var(--badge-red); }
+.lineage-remove.is-confirming {
+  background: var(--badge-red); color: #fff; font-size: 0.72rem; font-weight: 600;
+  padding: 2px 8px;
+}
+.lineage-remove.is-confirming:hover { background: var(--rowan-berry); color: #fff; }
+.lineage-focus-btn { border: none; background: transparent; padding: 2px 4px; font-size: 0.9rem; opacity: 0.7; }
+.lineage-focus-btn:hover { opacity: 1; }
+.lineage-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+/* --- Needs review ------------------------------------------------------------ */
+
+.review-count {
+  display: inline-block;
+  background: var(--rowan-berry);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 1px 8px;
+  vertical-align: middle;
+}
+.review-row {
+  padding: 8px; border-radius: 8px; border: 1px solid var(--rowan-berry);
+  background: rgba(230, 88, 85, 0.06);
+  margin-bottom: 6px; font-size: 0.82rem; cursor: pointer;
+}
+.review-row:hover { background: rgba(230, 88, 85, 0.14); }
+.review-row-name { font-weight: 600; }
+.review-row-note {
+  color: var(--text-muted); font-size: 0.76rem; margin-top: 2px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+/* --- Recently deleted (soft-deleted lines) ------------------------------- */
+
+.trash-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--bg-elevated-2);
+  margin-bottom: 6px; font-size: 0.82rem;
+}
+.trash-row-swatch { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.trash-row-info { flex: 1; min-width: 0; }
+.trash-row-name { font-weight: 600; }
+.trash-row-meta { color: var(--text-muted); font-size: 0.76rem; }
+
+.review-banner {
+  background: rgba(230, 88, 85, 0.1);
+  border: 1px solid var(--rowan-berry);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+}
+.review-banner-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--rowan-berry);
+  margin-bottom: 2px;
+}
+.review-banner p { margin: 0 0 8px 0; font-size: 0.84rem; color: var(--text); }
+#pResolveReviewBtn { background: var(--hawthorn-blossom); }
+
+/* Same shape as .review-banner, but gold/informational rather than red/urgent - shown
+   while stepping through people flagged by maybePromptForLocationDetail (main.js), not
+   flagging a problem with this specific person. */
+.location-review-banner {
+  background: rgba(196, 165, 36, 0.12);
+  border-color: var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.location-review-banner .review-banner-label { color: var(--gold); flex-basis: 100%; margin-bottom: 0; }
+.location-review-banner p { margin: 0; font-size: 0.84rem; flex: 1; }
+.location-review-actions { display: flex; gap: 8px; }
+
+.dialog-save-status {
+  font-size: 0.8rem;
+  color: var(--ivy-bloom);
+  align-self: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.dialog-save-status.is-visible { opacity: 1; }
+
+/* --- Person search --------------------------------------------------------- */
+
+#peopleSearchInput { width: 100%; margin-bottom: 6px; }
+.people-search-row {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+  padding: 6px 8px; border-radius: 8px; cursor: pointer; font-size: 0.82rem;
+}
+.people-search-row:hover { background: var(--bg-elevated-2); }
+.people-search-name { font-weight: 600; }
+.people-search-meta { color: var(--text-muted); font-size: 0.74rem; white-space: nowrap; }
+
+.gedcom-root-results { max-height: 180px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; margin-top: 4px; }
+.gedcom-root-results:empty { display: none; }
+.gedcom-root-results .people-search-row.is-selected { background: var(--bg-elevated-2); box-shadow: inset 2px 0 0 var(--accent); }
+
+/* --- Overlap list -------------------------------------------------------- */
+
+.overlap-section-label {
+  font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--text-muted); margin: 10px 0 6px 0;
+}
+.overlap-section-label:first-child { margin-top: 0; }
+
+.overlap-row {
+  position: relative;
+  padding: 8px; border-radius: 8px; border: 1px solid var(--border);
+  margin-bottom: 6px; font-size: 0.82rem; cursor: pointer;
+}
+.overlap-row:hover { background: var(--bg-elevated-2); }
+/* Same two-tier distinction as the map's own overlap-star markers (see components.css'
+   own .overlap-star / map/mapView.js's renderOverlapStars): a woman-from-one-line,
+   man-from-another lead spanning every family tree currently loaded, vs the same shape
+   of lead across only some of them. Only the first tier is numbered - see
+   computeNumberedOverlaps in main.js. */
+.overlap-row.is-all-lines { border-color: var(--gold); background: rgba(196, 165, 36, 0.08); }
+.overlap-row.is-partial-lead { border-color: var(--cowslip-meadow); background: rgba(228, 194, 89, 0.08); }
+.overlap-row-number {
+  float: right;
+  background: var(--blackthorn-berry);
+  color: var(--hawthorn-blossom);
+  font-family: var(--font-heading);
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 3px 6px;
+  border-radius: 999px;
+  margin-left: 6px;
+}
+.overlap-window { font-weight: 600; margin-bottom: 4px; }
+.overlap-member { display: flex; align-items: baseline; gap: 6px; padding: 1px 0; }
+.overlap-member-dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; }
+.overlap-member-name { font-weight: 600; }
+.overlap-member-place { color: var(--text-muted); font-size: 0.78rem; }
+.overlap-member-inferred { color: var(--gold); font-size: 0.72rem; font-style: italic; }
+.overlap-meta { color: var(--text-muted); font-size: 0.75rem; margin-top: 4px; }
+
+.overlap-map-toggle {
+  display: block;
+  margin-top: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-muted);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 0.72rem;
+}
+.overlap-map-toggle:hover { background: var(--bg-elevated-2); color: var(--text); }
+.overlap-mini-map { margin-top: 6px; }
+.overlap-mini-map .mini-map-canvas { height: 180px; cursor: grab; }
+.overlap-mini-map-caption { font-size: 0.72rem; color: var(--text-muted); margin: 0 0 4px; }
+
+/* --- family-chart card ---------------------------------------------------- */
+
+.f3-person-inner {
+  background: var(--node-person-bg);
+  color: var(--node-person-text);
+  border: 2px solid var(--canvas-border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  min-width: 160px;
+  position: relative;
+  font-size: 0.85rem;
+}
+.f3-person-inner.is-root { box-shadow: 0 0 0 2px var(--gold); }
+.f3-menu-hint {
+  position: absolute; top: 2px; right: 4px; border: none; background: transparent;
+  color: var(--canvas-text-muted); font-size: 1rem; padding: 2px 6px; cursor: pointer;
+}
+.f3-person-main { display: flex; flex-direction: column; }
+.f3-person-name { font-weight: 600; }
+.f3-person-years { font-size: 0.76rem; color: var(--canvas-text-muted); }
+.f3-root-flag { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gold); font-weight: 700; }
+.f3-lineage-flag { font-size: 0.7rem; font-weight: 600; margin-bottom: 2px; }
+
+.f3-person-inner.is-placeholder {
+  background: transparent;
+  border: 1.5px dashed var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+}
+.f3-placeholder-label { color: var(--accent); font-size: 0.8rem; font-weight: 600; }
+
+/* --- Map ------------------------------------------------------------------ */
+
+.map-popup { font-size: 0.85rem; display: flex; flex-direction: column; gap: 2px; }
+.map-popup-years { color: var(--text-muted); font-size: 0.78rem; }
+.map-popup-lineage { font-weight: 600; font-size: 0.78rem; }
+.map-popup-broad-note { color: var(--copper-beech); font-size: 0.76rem; line-height: 1.3; }
+.map-popup-edit { margin-top: 6px; align-self: flex-start; }
+
+.leaflet-popup-content-wrapper, .leaflet-popup-tip {
+  background: var(--hawthorn-blossom);
+  color: var(--text);
+  font-family: var(--font-body);
+}
+.leaflet-popup-content-wrapper { border-radius: 10px; }
+
+/* Where two family trees' paths actually cross, in the animation timeline - a gold
+   star that bangs in (overshoot + rebound), pulses a couple of times while it holds,
+   then fades - see spawnCollisionStar in map/mapView.js, which removes the marker
+   itself once this finishes. A ring on ::before/::after echoes the same rhythm behind
+   the glyph for extra weight, the same idea the old plain ripple had. Total runtime
+   matches COLLISION_STAR_LIFETIME_MS there (2.6s) so the marker never outlives its own
+   animation, or vice versa. */
+.collision-star {
+  position: relative;
+  display: block;
+  width: 1px;
+  height: 1px;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--pulse-color, var(--gold));
+  text-shadow: 0 0 10px var(--pulse-color, var(--gold)), 0 0 3px rgba(0, 0, 0, 0.4);
+  transform: translate(-50%, -50%);
+  animation: collision-star-bang 2.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+.collision-star::before, .collision-star::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 16px; height: 16px;
+  margin: -8px 0 0 -8px;
+  border-radius: 50%;
+  background: var(--pulse-color, var(--gold));
+  opacity: 0;
+  animation: collision-ripple 2.6s ease-out forwards;
+}
+.collision-star::after { animation-delay: 0.5s; }
+@keyframes collision-star-bang {
+  0% { transform: translate(-50%, -50%) scale(0) rotate(-60deg); opacity: 0; }
+  6% { transform: translate(-50%, -50%) scale(1.7) rotate(20deg); opacity: 1; }
+  12% { transform: translate(-50%, -50%) scale(0.9) rotate(-8deg); opacity: 1; }
+  18% { transform: translate(-50%, -50%) scale(1.15) rotate(0deg); opacity: 1; }
+  26%, 38% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  46% { transform: translate(-50%, -50%) scale(1.18); opacity: 1; }
+  58%, 68% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  76% { transform: translate(-50%, -50%) scale(1.18); opacity: 1; }
+  88% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(0.6); opacity: 0; }
+}
+@keyframes collision-ripple {
+  0%, 15% { transform: scale(0.5); opacity: 0; }
+  22% { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(6); opacity: 0; }
+}
+
+/* A persistent marker, not a one-shot animation like .collision-star above - one per
+   qualifying possible-overlap group (see renderOverlapStars in map/mapView.js and
+   computeNumberedOverlaps in main.js), staying on the map whether or not the timeline
+   is playing. Bold gold with a slow continuous glow marks a lead spanning every family
+   tree currently loaded - the strongest kind, numbered #1, #2... in the order they
+   happen; a paler, non-glowing yellow with no number marks the same shape of lead
+   (a woman from one line, a man from another) but across only some of the lines. */
+.overlap-star {
+  position: relative;
+  display: block;
+  width: 1px;
+  height: 1px;
+  font-size: 22px;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+  cursor: default;
+}
+.overlap-star.is-all-lines {
+  color: var(--gold);
+  text-shadow: 0 0 6px var(--gold), 0 1px 2px rgba(0, 0, 0, 0.5);
+  animation: overlap-star-glow 2.4s ease-in-out infinite;
+}
+.overlap-star.is-partial {
+  color: var(--cowslip-meadow);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+@keyframes overlap-star-glow {
+  0%, 100% { text-shadow: 0 0 6px var(--gold), 0 1px 2px rgba(0, 0, 0, 0.5); }
+  50% { text-shadow: 0 0 14px var(--gold), 0 1px 2px rgba(0, 0, 0, 0.5); }
+}
+.overlap-star-number {
+  position: absolute;
+  bottom: -2px;
+  right: -10px;
+  background: var(--blackthorn-berry);
+  color: var(--hawthorn-blossom);
+  font-family: var(--font-heading);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 999px;
+  text-shadow: none;
+}
+
+/* --- Bulk grid -------------------------------------------------------------- */
+
+.grid-dialog { width: min(920px, 95vw); }
+.grid-scroll { max-height: 45vh; overflow: auto; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; }
+table.bulk-grid { border-collapse: collapse; width: 100%; font-size: 0.8rem; }
+table.bulk-grid th {
+  position: sticky; top: 0; background: var(--bg-elevated-2);
+  text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+table.bulk-grid td { border-bottom: 1px solid var(--border); padding: 0; }
+table.bulk-grid input {
+  width: 100%; min-width: 90px; border: none; border-radius: 0; background: transparent;
+  padding: 6px 8px; font-size: 0.8rem;
+}
+table.bulk-grid input:focus { background: var(--bg-elevated-2); outline: 1px solid var(--accent); }
+
+.csv-dialog { width: min(560px, 92vw); }
+.csv-mapping-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.csv-mapping-row label { flex: 0 0 130px; margin: 0; font-size: 0.8rem; }
+.csv-mapping-row select { flex: 1; }
+
+/* --- Guided tour -------------------------------------------------------- */
+/* Two independently-positioned fixed elements (see positionTourStep in main.js) - no
+   separate full-viewport dimming layer needed: the highlight box's own box-shadow
+   carries both the gold ring AND the dark backdrop (a shadow spread of 9999px paints
+   everywhere outside the box's own edge, which is exactly a spotlight cutout). */
+/* pointer-events: auto on the wrapper (not just the callout) is deliberate - while the
+   tour is up, a click anywhere else on the page (including the dimmed backdrop, same
+   as this app's other dialogs) ends the tour rather than reaching whatever's
+   underneath, so stepping through it can't accidentally also edit the tree. */
+.tour-overlay { position: fixed; inset: 0; z-index: 500; pointer-events: auto; }
+.tour-highlight-box {
+  position: fixed;
+  border-radius: 10px;
+  box-shadow: 0 0 0 3px var(--gold), 0 0 0 9999px rgba(20, 24, 22, 0.6);
+  transition: top 0.25s ease, left 0.25s ease, width 0.25s ease, height 0.25s ease;
+  pointer-events: none;
+}
+.tour-callout {
+  position: fixed;
+  width: 300px;
+  max-width: calc(100vw - 28px);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+  pointer-events: auto;
+  transition: top 0.25s ease, left 0.25s ease;
+}
+.tour-callout-step {
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 4px;
+}
+.tour-callout h3 { font-size: 1rem; margin: 0 0 6px 0; }
+.tour-callout p { font-size: 0.85rem; margin: 0 0 14px 0; color: var(--text); }
+.tour-callout-actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+
+/* A tiny illustrative loop, not a real map - just enough to show what "watch people
+   from different family trees cross paths" actually looks like in motion before
+   anyone's added data of their own to show it with. Two dots drift toward each other
+   and a gold star flashes right as they meet, looping - the same navy/gold pairing as
+   the real map and its own collision stars, so it reads as a preview of THIS app's
+   map specifically, not a generic loading animation. */
+.tour-preview {
+  position: relative;
+  height: 64px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  background: var(--blackthorn-berry);
+  overflow: hidden;
+}
+.tour-map-demo-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 9px;
+  height: 9px;
+  margin: -4.5px 0 0 -4.5px;
+  border-radius: 50%;
+  animation: tour-map-demo-move 3.2s ease-in-out infinite;
+}
+.tour-map-demo-dot.a { background: var(--ivy-bloom); animation-name: tour-map-demo-move-a; }
+.tour-map-demo-dot.b { background: var(--raspberry-cane); animation-name: tour-map-demo-move-b; }
+@keyframes tour-map-demo-move-a {
+  0%, 100% { transform: translate(-86px, -16px); }
+  50% { transform: translate(6px, 4px); }
+}
+@keyframes tour-map-demo-move-b {
+  0%, 100% { transform: translate(86px, 16px); }
+  50% { transform: translate(-6px, -4px); }
+}
+.tour-map-demo-star {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.4);
+  color: var(--gold);
+  font-size: 18px;
+  line-height: 1;
+  opacity: 0;
+  animation: tour-map-demo-star 3.2s ease-in-out infinite;
+}
+@keyframes tour-map-demo-star {
+  0%, 38%, 62%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.3); }
+}

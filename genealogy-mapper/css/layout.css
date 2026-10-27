@@ -1,0 +1,533 @@
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  flex-wrap: wrap;
+}
+.topbar-title { display: flex; flex-direction: column; }
+.kicker {
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.topbar-title h1 { font-size: 1.3rem; margin: 0; }
+
+/* The app's main call to action, not one more small utility button crowded in among
+   Take a tour / Help / Export JSON - its own bar so it actually reads as the biggest,
+   most prominent thing under the header, matching what a comparison IS here: the
+   whole reason to load more than one family tree in the first place. */
+.comparison-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.btn-comparison-cta {
+  border-radius: 999px;
+  border: none;
+  background: var(--accent);
+  color: var(--hawthorn-blossom);
+  font-weight: 700;
+  font-size: 1.05rem;
+  padding: 14px 28px;
+  box-shadow: 0 4px 14px rgba(64, 101, 74, 0.28);
+}
+.btn-comparison-cta:hover { filter: brightness(1.08); }
+.btn-comparison-cta-secondary {
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  background: var(--hawthorn-blossom);
+  color: var(--accent-strong);
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 12px 22px;
+}
+.btn-comparison-cta-secondary:hover { background: var(--bg-elevated-2); }
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+.save-status { font-size: 0.78rem; color: var(--text-muted); }
+.save-status.is-saved { color: var(--ivy-bloom); }
+.save-status.is-local { color: var(--text-muted); }
+.start-over-btn {
+  border: 1px solid var(--border);
+  background: transparent;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  color: var(--badge-red);
+}
+
+.account-area { display: flex; align-items: center; }
+.btn-account { border-radius: 999px; padding: 6px 14px; font-size: 0.85rem; }
+.account-chip { display: flex; align-items: center; gap: 8px; }
+.btn-account-sm { padding: 5px 10px; font-size: 0.8rem; }
+.btn-account-solid { background: var(--accent); border-color: var(--accent); color: var(--hawthorn-blossom); }
+.account-email { font-size: 0.78rem; color: var(--text-muted); }
+.account-signout {
+  border: none; background: transparent; color: var(--text-muted);
+  text-decoration: underline; font-size: 0.78rem; padding: 0;
+}
+
+/* Stacked top to bottom - add/manage on the left, the family tree view on the right,
+   then the map, then the overlaps listing - rather than the old fixed-height app-shell
+   (sidebar + two side-by-side panels, nothing else). Tall enough that the page scrolls
+   past a single viewport, which is fine here: unlike the tree/map panels (each sized
+   to something concrete below), the overlaps listing has no natural cap on how long it
+   gets, so it reads as a normal page section you scroll to, not a fixed dashboard tile. */
+/* The sidebar, tree, and map used to butt straight up against each other with nothing
+   but a 1px border line between them (and the map ran flush to the window's own
+   edges) - padding here gives the whole page a little breathing room, and the gap
+   below does the same between the three panels themselves, now that each is its own
+   fully-bordered, rounded card (see .side-pane and .view-panel) rather than a slab
+   sharing an edge with its neighbor. */
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 16px;
+  gap: 16px;
+}
+
+.top-row {
+  display: grid;
+  grid-template-columns: minmax(280px, 380px) 1fr;
+  gap: 16px;
+  height: 78vh;
+  min-height: 560px;
+}
+
+.side-pane {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  overflow-y: auto;
+  background: var(--bg-elevated);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.side-section h2 { font-size: 0.95rem; margin-bottom: 6px; }
+.side-hint { font-size: 0.78rem; color: var(--text-muted); margin: 0 0 8px 0; }
+.side-footnote { font-size: 0.68rem; color: var(--text-muted); margin-top: auto; }
+.side-footnote a { color: inherit; }
+
+.import-buttons { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+
+/* border/border-radius frame the tree and map panels as their own cards (see the
+   .app-main comment above); overflow: hidden clips their content - the fan chart, the
+   cards view, Leaflet's own square tile edges - to those rounded corners, which none of
+   them do on their own. */
+.view-panel {
+  position: relative;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.map-row {
+  height: 110vh;
+  min-height: 760px;
+}
+
+/* Full-width, natural-height page section below the map - "then" the two collision
+   lists, stacked (not side by side): each row already carries names/places/years, so a
+   half-width column would just force everything to wrap. Framed the same way as the
+   sidebar/tree/map above it (full border, same rounded corner) rather than just a top
+   border, so it reads as one more card in the same set instead of a leftover flat slab. */
+.overlaps-row {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px 28px;
+  background: var(--bg-elevated);
+}
+.overlaps-row h2 { font-size: 1.1rem; }
+.overlaps-row-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.overlaps-row-header .side-hint { margin-bottom: 0; max-width: 60ch; }
+#reviewBroadLocationsBtn { flex-shrink: 0; white-space: nowrap; }
+.overlap-list { margin-bottom: 20px; }
+.overlap-list:last-child { margin-bottom: 0; }
+
+/* Sits between the sidebar/tree/map row and the map itself, as its own card in the
+   same set (see .overlaps-row above) - deliberately full-width and compact (not another
+   78vh-tall panel), since it's a quick status check on the way to the map, not a
+   destination of its own. */
+.map-readiness-row {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 24px;
+  background: var(--bg-elevated);
+}
+.map-readiness-row h2 { font-size: 1rem; margin-bottom: 2px; }
+.map-readiness-row .side-hint { margin-bottom: 10px; }
+
+.panel-label {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  z-index: 3;
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--canvas-text-muted);
+  background: rgba(249, 248, 244, 0.78);
+  padding: 3px 10px;
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.panel-expand-btn {
+  position: absolute;
+  z-index: 4;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  line-height: 1;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(249, 248, 244, 0.85);
+  color: var(--canvas-text-muted);
+  padding: 0;
+}
+.panel-expand-btn:hover { background: var(--hawthorn-blossom); color: var(--text); }
+/* Tree's own top-right corner is already taken by .tree-mode-bar, so its expand button
+   goes bottom-right instead, clear of both that and the bottom-center .viewport-hint;
+   the map has nothing else up top, so its button sits beside the panel label there. */
+#treeExpandBtn { bottom: 10px; right: 12px; }
+#mapExpandBtn { top: 8px; right: 12px; }
+
+/* Manual "check again" for the map: re-fits the camera to whatever's currently
+   geocoded AND re-kicks the geocoding pass, in case anything's still pending (a big
+   import still trickling in, or a pass that never got triggered). Plain and unobtrusive
+   normally; .has-pending (set in main.js, from countPendingGeocodes(tree) > 0) switches
+   it to an amber, gently pulsing "something's still loading" warning so it's obvious
+   there's more data on the way without needing to go hunting for a status line. */
+.map-refresh-btn {
+  position: absolute;
+  top: 8px;
+  right: 50px;
+  z-index: 4;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(249, 248, 244, 0.85);
+  color: var(--canvas-text-muted);
+  padding: 5px 12px;
+  font-size: 0.76rem;
+  white-space: nowrap;
+}
+.map-refresh-btn:hover { background: var(--hawthorn-blossom); color: var(--text); }
+.map-refresh-btn.has-pending {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--blackthorn-berry);
+  font-weight: 700;
+  animation: map-refresh-pulse 1.6s ease-in-out infinite;
+}
+@keyframes map-refresh-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(196, 165, 36, 0.55); }
+  50% { box-shadow: 0 0 0 7px rgba(196, 165, 36, 0); }
+}
+
+/* Live total across EVERY loaded family tree - not just one lineage's own row in the
+   "Ready to map?" section below - sitting right on the map itself (top-center, between
+   the panel label and the refresh/expand buttons) so a geocoding run can be watched to
+   completion without looking away from the map. Amber+pulsing while anything's still
+   being looked up (same treatment as .map-refresh-btn.has-pending, so the two read as
+   one language); flips to a solid green "done" the moment nothing's pending anymore -
+   see updateMapStatusBadge in main.js. */
+.map-status-badge {
+  /* Its own row just below the label/refresh/expand row (those sit at top:8-10px, ~30px
+     tall) rather than squeezed between them on the same line - this text is the whole
+     point of the badge, so it gets the full width to itself instead of fighting two
+     other corner elements for horizontal room. */
+  position: absolute;
+  top: 44px;
+  left: 12px;
+  right: 12px;
+  z-index: 4;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(249, 248, 244, 0.9);
+  color: var(--canvas-text-muted);
+  padding: 5px 14px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.map-status-badge.is-pending {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--blackthorn-berry);
+  animation: map-refresh-pulse 1.6s ease-in-out infinite;
+}
+.map-status-badge.is-done {
+  background: var(--ivy-bloom);
+  border-color: var(--ivy-bloom);
+  color: var(--hawthorn-blossom);
+  animation: none;
+}
+
+.tree-mode-bar {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tree-mode-toggle {
+  display: flex;
+  gap: 2px;
+  background: rgba(249, 248, 244, 0.85);
+  border-radius: 999px;
+  padding: 3px;
+}
+.tree-mode-btn {
+  border: none;
+  background: transparent;
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 0.78rem;
+  color: var(--canvas-text-muted);
+}
+.tree-mode-btn.is-active {
+  background: var(--accent);
+  color: var(--hawthorn-blossom);
+  font-weight: 600;
+}
+.fan-generations-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--canvas-text-muted);
+  background: rgba(249, 248, 244, 0.85);
+  border-radius: 999px;
+  padding: 4px 10px;
+}
+.fan-generations-row select { padding: 2px 4px; font-size: 0.75rem; }
+
+#FamilyChart {
+  flex: 1;
+  background: var(--canvas-bg);
+  min-height: 0;
+}
+.f3-cont { width: 100%; height: 100%; }
+
+.fan-chart-container {
+  flex: 1;
+  min-height: 0;
+  background: var(--canvas-bg);
+  overflow: hidden;
+  position: relative;
+  cursor: grab;
+}
+.fan-chart-container:active { cursor: grabbing; }
+.fan-chart-container svg { display: block; width: 100%; height: 100%; touch-action: none; }
+.fan-wedge { cursor: pointer; stroke: var(--canvas-bg); stroke-width: 1.5; }
+.fan-wedge:hover { filter: brightness(1.08); }
+.fan-wedge.is-empty { fill: var(--canvas-bg-elevated); cursor: default; }
+.fan-wedge.is-empty:hover { filter: none; }
+.fan-wedge.is-empty.is-addable { fill: var(--canvas-bg); cursor: pointer; stroke: var(--accent); stroke-dasharray: 3,3; }
+.fan-wedge.is-empty.is-addable:hover { fill: var(--canvas-bg-elevated); filter: none; }
+.fan-wedge-text {
+  font-family: var(--font-body);
+  fill: var(--canvas-text);
+  pointer-events: none;
+}
+.fan-wedge-years { fill: var(--canvas-text-muted); }
+.fan-root-circle { fill: var(--node-person-bg); stroke: var(--canvas-border); stroke-width: 1.5; cursor: pointer; }
+.fan-root-circle:hover { filter: brightness(0.97); }
+.fan-root-blank { fill: var(--canvas-bg-elevated); stroke: var(--canvas-border); stroke-width: 2; stroke-dasharray: 5,5; }
+.fan-root-blank:hover { fill: var(--canvas-bg); }
+.fan-blank-plus { fill: var(--canvas-text-muted); font-family: var(--font-heading); }
+.fan-blank-label { fill: var(--canvas-text-muted); }
+
+/* Flashed on a wedge/root-circle by pulseFanPerson (fanChart.js) when the sidebar
+   search finds someone already in the currently-rendered fan - the fan's root never
+   moves for a search, so this is how the found person actually gets shown to the
+   viewer instead. */
+@keyframes fan-pulse-ring {
+  0%, 100% { stroke: var(--canvas-border); stroke-width: 1.5; }
+  50% { stroke: var(--gold); stroke-width: 5; }
+}
+.fan-wedge.fan-pulse, .fan-root-circle.fan-pulse {
+  animation: fan-pulse-ring 0.8s ease-in-out 3;
+}
+
+/* A floating callout over the blank fan placeholder (rather than covering it) - so the
+   clickable "add your starting person" shape stays visible right behind it, and the
+   bubble reads as pointing down at the ways to actually get started. */
+.empty-state-pane {
+  position: absolute;
+  top: 44px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  padding: 16px 20px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.14);
+  z-index: 3;
+}
+.empty-state-pane::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 14px;
+  height: 14px;
+  background: var(--bg);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.empty-state-pane p { margin: 0; color: var(--text); font-size: 0.88rem; }
+.empty-state-pane p a { color: var(--accent-strong); font-weight: 600; }
+.sample-data-btn { color: var(--accent-strong); text-decoration: underline; }
+.replay-onboarding-btn { color: var(--text-muted); font-size: 0.75rem; text-decoration: underline; }
+
+.viewport-hint {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.72rem;
+  color: var(--canvas-text-muted);
+  background: rgba(249, 248, 244, 0.7);
+  padding: 3px 10px;
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.map-container { flex: 1; min-height: 0; }
+
+/* Lightbox: fullscreen home for whichever of #treeView / #mapView is expanded. z-index
+   600 clears the guided tour's overlay (500) in case both are ever open at once. */
+body.lightbox-open { overflow: hidden; }
+
+.panel-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 600;
+  background: rgba(20, 30, 33, 0.86);
+  padding: 4vh 3vw;
+}
+/* :not([hidden]), not a plain .panel-lightbox rule, because [hidden] and a class
+   selector have equal CSS specificity - a later same-specificity `display` rule wins
+   over the UA stylesheet's `[hidden] { display: none }` and shows it regardless of the
+   attribute. Scoping display to :not([hidden]) keeps the attribute authoritative. */
+.panel-lightbox:not([hidden]) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.panel-lightbox-content {
+  width: 100%;
+  height: 100%;
+  max-width: 1600px;
+  background: var(--bg);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+.panel-lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  z-index: 601;
+  border-radius: 999px;
+  border: 1px solid rgba(249, 248, 244, 0.4);
+  background: rgba(20, 30, 33, 0.6);
+  color: var(--hawthorn-blossom);
+  padding: 8px 16px;
+  font-size: 0.85rem;
+}
+.panel-lightbox-close:hover { background: rgba(20, 30, 33, 0.85); }
+
+/* Overrides the fixed/viewport-relative heights #treeView and #mapView normally get
+   from their place in the page (the .top-row grid cell, or .map-row's own 110vh) - once
+   reparented into the lightbox, they should just fill the content box above instead. */
+.view-panel.is-lightboxed {
+  height: 100% !important;
+  min-height: 0 !important;
+  width: 100%;
+  /* .panel-lightbox-content already draws its own border-radius'd card behind this -
+     the panel's own border/radius would otherwise show as a second, redundant frame
+     nested just inside it. */
+  border: none;
+  border-radius: 0;
+}
+
+.timeline-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-elevated);
+}
+.timeline-year {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  min-width: 3.5em;
+  text-align: center;
+}
+.timeline-slider { flex: 1; }
+
+@media (max-width: 860px) {
+  /* grid-template-rows is explicit (not left to default `auto` tracks) because an
+     implicit auto-sized track paired with an overflow:auto item collapses to that
+     item's padding-only size instead of its content size - a well-known grid/flex
+     sizing gotcha. minmax(min-content, 50vh) forces the row to size to the sidebar's
+     actual content, capped at the same 50vh the sidebar itself is capped to. */
+  /* flex-shrink: 0 because .app-main's ancestors (html, body) are pinned to exactly
+     100% of the viewport height, so with the default flex-shrink:1 the flexbox
+     algorithm was crushing .top-row all the way down to 0 to force it to fit, rather
+     than letting it keep its natural (taller-than-viewport) content height and letting
+     the page scroll - which is the actual intended behavior here. */
+  .top-row { grid-template-columns: 1fr; grid-template-rows: minmax(min-content, 50vh) auto; height: auto; min-height: 0; flex-shrink: 0; }
+  /* .side-pane's border is already a full 1px border on all four sides now (not just a
+     border-right) - that already reads correctly once it's stacked above the tree
+     instead of beside it, so there's nothing left to override here. */
+  .side-pane { max-height: 50vh; }
+  #treeView { height: 70vh; min-height: 420px; }
+  .map-row { height: 120vh; }
+}

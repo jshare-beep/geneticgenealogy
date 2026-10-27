@@ -1,0 +1,120 @@
+/* Style guide: a hedgerow/countryside palette (13 named colors), paired with a warm
+   "reading room" type system - Fraunces for headings (already literary), Lora for body
+   text (a book serif, in place of a sans) for a cozy, librarian feel throughout. */
+:root {
+  /* Named palette ------------------------------------------------------- */
+  --hawthorn-blossom: #f9f8f4; /* warm off-white */
+  --ivy-bloom: #40654a;        /* deep green */
+  --gorse-bloom: #c4a524;      /* mustard gold */
+  --silver-birch: #d5dcdf;     /* pale blue-grey */
+  --cowslip-meadow: #e4c259;   /* soft yellow */
+  --wild-honeysuckle: #ed9f77; /* peach */
+  --blackthorn-berry: #224653; /* dark navy */
+  --dog-rose: #dca3b9;         /* pink */
+  --foxglove-bell: #d2437a;    /* magenta */
+  --willow-leaf: #86915d;      /* olive */
+  --rowan-berry: #e65855;      /* red-coral */
+  --copper-beech: #c45524;     /* burnt orange */
+  --raspberry-cane: #9c2b54;   /* raspberry red-purple */
+
+  /* Chrome tokens --------------------------------------------------------- */
+  --bg: var(--hawthorn-blossom);
+  --bg-elevated: #f1efe7;
+  --bg-elevated-2: var(--silver-birch);
+  --border: #c9cfc7;
+  --text: var(--blackthorn-berry);
+  --text-muted: #5c6f68;
+
+  --accent: var(--ivy-bloom);
+  --accent-light: var(--cowslip-meadow);
+  --accent-strong: var(--blackthorn-berry);
+
+  --badge-red: var(--rowan-berry);
+  --gold: var(--gorse-bloom);
+
+  --canvas-bg: var(--silver-birch);
+  --canvas-bg-elevated: #e4e9ea;
+  --canvas-border: #b7c1c3;
+  --canvas-text: var(--blackthorn-berry);
+  --canvas-text-muted: #4c6169;
+
+  --node-person-bg: var(--hawthorn-blossom);
+  --node-person-text: var(--blackthorn-berry);
+
+  --tree-line-color: #9fa9a1;
+
+  --radius: 14px;
+  --font-sans: 'Lora', Georgia, 'Iowan Old Style', serif;
+  --font-body: 'Lora', Georgia, 'Iowan Old Style', serif;
+  --font-heading: 'Fraunces', Georgia, 'Iowan Old Style', serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+}
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2, h3, h4 {
+  margin: 0 0 0.4em 0;
+  font-family: var(--font-heading);
+  font-weight: 600;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input, select, textarea {
+  font-family: inherit;
+  background: var(--bg-elevated-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+
+.btn {
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  background: var(--bg-elevated-2);
+  color: var(--text);
+}
+.btn:hover { filter: brightness(0.97); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-sm { padding: 5px 10px; font-size: 0.82rem; }
+.btn-block { width: 100%; }
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--hawthorn-blossom);
+  font-weight: 600;
+}
+.btn-primary:hover { filter: brightness(1.1); }
+.btn-secondary {
+  background: var(--hawthorn-blossom);
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+.btn-ghost { background: transparent; border-color: transparent; }
+.btn-danger { color: var(--badge-red); }
+
+.empty-state {
+  color: var(--text-muted);
+  font-style: italic;
+}
