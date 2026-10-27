@@ -1,0 +1,123 @@
+:root {
+  /* Chrome (header/sidebar/dialogs) - white magazine-page theme. */
+  --bg: #ffffff;
+  --bg-elevated: #fbfaf7;
+  --bg-elevated-2: #f2efe8;
+  --border: #e7e2d8;
+  --text: #211d16;
+  --text-muted: #756d5e;
+
+  /* User-supplied palette, used everywhere a color is needed outside the plain
+     white/tan backgrounds and neutral text/border grays above - no more warm
+     brown/amber or green anywhere in the app. */
+  --accent: #8e4585;
+  --accent-light: #dca1a1;
+  --accent-strong: #4a4a4a;
+
+  --badge-red: #996666;
+  --badge-green: #8e4585;
+  --badge-strongest: #8e4585;
+  --warning-bg: #996666;
+
+  /* Work area (family-chart tree canvas) - warm greige, pinned to its own tokens so
+     the tree keeps its own look independent of the surrounding chrome theme. */
+  --canvas-bg: #ddd4c3;
+  --canvas-bg-elevated: #eae3d5;
+  --canvas-border: #bfb29a;
+  --canvas-text: #2b2418;
+  --canvas-text-muted: #71664f;
+
+  --node-person-bg: #fffcf6;
+  --node-person-text: #26211a;
+
+  /* Possibility palette: gold for anything still possible (viable or currently
+     strongest - the badge text distinguishes those, not color), muted mauve for the
+     tree's connector lines, plum for half-sibling lines. The "ruled out"
+     (impossibility) color is intentionally untouched from before. */
+  --node-possibility-bg: #cfb12f;
+  --node-possibility-text: #3d3115;
+  --node-possibility-eliminated-bg: #a89b83;
+  --node-possibility-eliminated-text: #4a4232;
+
+  --tree-line-color: #996666;
+
+  --radius: 14px;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-heading: 'Fraunces', Georgia, 'Iowan Old Style', serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+}
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2, h3, h4 {
+  margin: 0 0 0.4em 0;
+  font-family: var(--font-heading);
+  font-weight: 600;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input, select, textarea {
+  font-family: inherit;
+  background: var(--bg-elevated-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+
+.btn {
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  background: var(--bg-elevated-2);
+  color: var(--text);
+}
+.btn:hover {
+  filter: brightness(0.97);
+}
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff9f0;
+  font-weight: 600;
+}
+.btn-primary:hover {
+  filter: brightness(1.08);
+}
+.btn-secondary {
+  background: #fff;
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+.btn-ghost {
+  background: transparent;
+  border-color: transparent;
+}
+.btn-danger {
+  color: var(--badge-red);
+}
+
+.empty-state {
+  color: var(--text-muted);
+  font-style: italic;
+}

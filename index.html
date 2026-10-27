@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Genealogy Tools</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Lora:ital,wght@0,400;0,500;0,600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #faf8f4;
+      --text: #241f1a;
+      --text-muted: #756d5e;
+      --border: #e7e2d8;
+      --font-heading: 'Fraunces', Georgia, serif;
+      --font-body: 'Lora', Georgia, serif;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8vh 20px 60px;
+    }
+    header {
+      text-align: center;
+      max-width: 540px;
+      margin-bottom: 48px;
+    }
+    .kicker {
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    h1 {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 2.2rem;
+      margin: 0.3em 0 0.4em;
+    }
+    header p {
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1.5;
+      margin: 0;
+    }
+    .tools {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      width: 100%;
+      max-width: 820px;
+    }
+    .tool-card {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 28px 26px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: #fff;
+      text-decoration: none;
+      color: var(--text);
+      box-shadow: 0 1px 2px rgba(30, 24, 14, 0.03);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+    .tool-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(30, 24, 14, 0.08);
+    }
+    .tool-card.multifacet:hover { border-color: #8e4585; }
+    .tool-card.mapper:hover { border-color: #40654a; }
+    .tool-kicker {
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .tool-card.multifacet .tool-kicker { color: #8e4585; }
+    .tool-card.mapper .tool-kicker { color: #40654a; }
+    .tool-card h2 {
+      font-family: var(--font-heading);
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin: 0;
+    }
+    .tool-card p {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+      margin: 0;
+    }
+    .tool-go {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .tool-card.multifacet .tool-go { color: #8e4585; }
+    .tool-card.mapper .tool-go { color: #40654a; }
+    footer {
+      margin-top: 56px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="kicker">Genetic &amp; documentary genealogy</span>
+    <h1>Genealogy Tools</h1>
+    <p>Two tools for working out how family lines connect - one from DNA matches inward, one from paper trails and place across time.</p>
+  </header>
+
+  <div class="tools">
+    <a class="tool-card multifacet" href="multifacet/">
+      <span class="tool-kicker">DNA matches</span>
+      <h2>Multifacet</h2>
+      <p>Build out multi-branch pedigrees around a DNA match and weigh relationship possibilities by shared cM.</p>
+      <span class="tool-go">Open Multifacet →</span>
+    </a>
+
+    <a class="tool-card mapper" href="genealogy-mapper/">
+      <span class="tool-kicker">Paper trails</span>
+      <h2>Genealogy Mapper</h2>
+      <p>Plot ancestors from two family lines on a map and timeline to see where - and whether - their paths cross.</p>
+      <span class="tool-go">Open Genealogy Mapper →</span>
+    </a>
+  </div>
+
+  <footer>Both tools save locally in your browser by default.</footer>
+</body>
+</html>

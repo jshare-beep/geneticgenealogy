@@ -1,4 +1,8 @@
-# Genealogy Mapper
+# Genetic Genealogy tools
+
+Two browser-based tools: **Genealogy Mapper** (plots family-tree research on a map and timeline) and **Multifacet** (`multifacet/`, scores DNA matches against a tree).
+
+## Genealogy Mapper
 
 Plot your family-tree research on a shared map and timeline to find where different lines of ancestry might have crossed paths.
 
@@ -12,7 +16,7 @@ Everything runs in the browser - no build step, no framework. Trees are saved in
 npx serve -l 8842 .
 ```
 
-Then open <http://localhost:8842/genealogy-mapper/> (keep the trailing slash).
+Then open <http://localhost:8842/> for both tools, or <http://localhost:8842/genealogy-mapper/> (keep the trailing slash) for the mapper directly.
 
 ## Built with
 

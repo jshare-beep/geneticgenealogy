@@ -1,0 +1,675 @@
+/* --- family-chart container + card overrides ---
+   family-chart owns layout/lines/pan-zoom; these rules only theme its container and
+   the custom card content supplied via cardInnerHtmlCreator() in main.js. */
+
+.f3.f3-cont {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  background-color: transparent;
+  --background-color: transparent;
+  --text-color: var(--canvas-text);
+  font-family: var(--font-sans);
+}
+.f3 .link {
+  stroke: var(--tree-line-color);
+  stroke-width: 2px;
+}
+
+/* The library's own .f3-form-cont relies on `height: 100%`, which doesn't reliably
+   resolve against a flex-sized (not explicit-height) ancestor in every browser. Anchor
+   with top/right/bottom instead so the edit panel reliably fills the container's
+   height as a right-docked overlay regardless of that. */
+#FamilyChart .f3-form-cont {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  height: auto;
+}
+
+.f3-person-inner {
+  position: relative;
+  min-width: 150px;
+  max-width: 190px;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  background: var(--node-person-bg);
+  color: var(--node-person-text);
+  box-shadow: 0 1px 3px rgba(30, 25, 15, 0.18);
+  border: 1px solid var(--canvas-border);
+}
+
+.f3-person-main {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.f3-person-name {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.f3-person-years {
+  flex: none;
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  opacity: 0.65;
+}
+/* The un-expanded partner folded into this card, ancestral-couple-pill style (see
+   familyChartAdapter.js) - a thin rule separates the two names within one pill. */
+.f3-co-spouse {
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--canvas-border);
+}
+.f3-person-cm {
+  margin-top: 6px;
+  display: inline-block;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 0.66rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  background: var(--accent);
+  color: #fff9f0;
+}
+
+/* Every card opens the person menu on click by default (branch cards jump straight
+   into their branch view instead - see main.js); this button is always a way to reach
+   the menu regardless, and is a persistent visual hint that the card is interactive
+   (not hover-only - the whole point is to stop hiding affordances behind hover
+   discovery). */
+.f3-menu-hint {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  border: none;
+  background: none;
+  padding: 2px;
+  font-size: 0.85rem;
+  line-height: 1;
+  color: var(--canvas-text-muted);
+  opacity: 0.6;
+  cursor: pointer;
+}
+.f3-person-inner:hover .f3-menu-hint {
+  opacity: 1;
+  color: var(--accent);
+}
+
+/* --- Possibility modifiers on the real person card ---
+   A Possibility is a flag on a real Person (see graph.js), not a separate node type,
+   so it's rendered as this dashed/tinted variant of the normal person card rather than
+   a distinct shape. Just two designated colors: one for "still possible" (whether or
+   not it's currently the strongest - the badge text carries that nuance) and one for
+   "ruled out," which stays exactly as it was. */
+.f3-person-inner.is-possibility {
+  background: var(--node-possibility-bg);
+  color: var(--node-possibility-text);
+  border-style: dashed;
+  border-width: 2px;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+.f3-person-inner.is-possibility.is-eliminated {
+  background: var(--node-possibility-eliminated-bg);
+  color: var(--node-possibility-eliminated-text);
+  border-style: solid;
+}
+.f3-poss-flag {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--node-possibility-text);
+  opacity: 0.75;
+  margin-bottom: 4px;
+}
+.f3-person-inner.is-possibility.is-eliminated .f3-poss-flag {
+  color: var(--node-possibility-eliminated-text);
+  opacity: 0.75;
+}
+.f3-poss-badge {
+  margin-top: 6px;
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+/* --- Branch modifiers on the real person card ---
+   A Branch is a flag on a real Person marking an independently-explorable line (see
+   graph.js). Its color is assigned per-branch and applied inline (border-color and
+   box-shadow), since each branch gets its own stable color from a palette rather than
+   a single fixed token. Cursor + hint text signal that clicking jumps straight into
+   that branch's view instead of opening the menu (unlike every other card). */
+.f3-person-inner.is-branch {
+  border-width: 3px;
+  cursor: pointer;
+}
+.f3-branch-flag {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+.f3-branch-hint {
+  margin-top: 6px;
+  font-size: 0.64rem;
+  font-style: italic;
+  color: var(--canvas-text-muted);
+}
+
+/* --- Small icon buttons (sidebar match list, matches dialog) --- */
+
+.node-btn {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--text);
+  font-size: 0.66rem;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+.node-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+.node-btn-icon {
+  padding: 3px 7px;
+}
+.node-btn-danger {
+  color: var(--badge-red);
+}
+
+/* --- Account area (header) --- */
+
+.btn-account {
+  border-radius: 999px;
+  border: 1px solid var(--text);
+  padding: 8px 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  background: transparent;
+  color: var(--text);
+}
+.btn-account:hover {
+  background: var(--text);
+  color: var(--bg);
+}
+.btn-account-sm {
+  padding: 6px 16px;
+  font-size: 0.76rem;
+}
+.btn-account-solid {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff9f0;
+}
+.btn-account-solid:hover {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+  color: #fff9f0;
+}
+
+.account-chip[hidden] {
+  display: none;
+}
+.account-chip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.account-email {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.account-signout {
+  border: none;
+  background: none;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  text-decoration: underline;
+  padding: 0;
+}
+.account-signout:hover {
+  color: var(--accent-strong);
+}
+
+.start-over-btn[hidden] {
+  display: none;
+}
+.start-over-btn {
+  border: none;
+  background: none;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  text-decoration: underline;
+  padding: 0;
+}
+.start-over-btn:hover {
+  color: var(--badge-red);
+}
+
+/* --- Side panel: matches & results --- */
+
+.match-list-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+.match-list-main {
+  flex: 1;
+  min-width: 0;
+}
+.match-list-name {
+  font-weight: 600;
+}
+.match-list-anchor {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+.match-list-cm {
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--accent-strong);
+  white-space: nowrap;
+}
+
+.branch-list-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-left-width: 4px;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  text-align: left;
+  font-family: inherit;
+}
+.branch-list-item:hover {
+  background: var(--bg-elevated-2);
+}
+.branch-list-item.is-active {
+  background: var(--bg-elevated-2);
+}
+.branch-list-dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.branch-list-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.branch-list-name {
+  font-weight: 600;
+  color: var(--text);
+}
+.branch-list-hint {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.result-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  background: var(--bg-elevated);
+}
+.result-card.is-top {
+  border-color: var(--badge-strongest);
+  box-shadow: 0 0 0 1px var(--badge-strongest);
+}
+.result-card.is-eliminated {
+  opacity: 0.65;
+}
+.result-title {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.result-score {
+  font-size: 0.82rem;
+  color: var(--accent-strong);
+  margin-bottom: 4px;
+}
+.result-card.is-eliminated .result-score {
+  color: var(--badge-red);
+}
+.result-coverage {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+.result-detail-list {
+  margin: 4px 0;
+  padding-left: 18px;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+.result-facets {
+  margin-top: 6px;
+  font-size: 0.76rem;
+}
+.result-facets-title {
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+.facet-row {
+  padding-left: 8px;
+  color: var(--text-muted);
+}
+.result-note {
+  margin-top: 6px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* --- Dialogs --- */
+
+dialog {
+  background: #fff;
+  color: var(--text);
+  border: none;
+  border-radius: 14px;
+  padding: 28px;
+  max-width: 480px;
+  width: 90vw;
+  box-shadow: 0 20px 50px -12px rgba(20, 20, 30, 0.25);
+}
+dialog::backdrop {
+  background: rgba(30, 25, 18, 0.35);
+}
+
+.person-dialog form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.person-dialog h3 {
+  font-size: 1.3rem;
+}
+.person-dialog label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.form-row {
+  display: flex;
+  gap: 10px;
+}
+.form-row > label,
+.form-row > input {
+  flex: 1;
+}
+
+.dialog-match-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  font-size: 0.82rem;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  background: #fff;
+  color: #3c4043;
+}
+.btn-google:hover {
+  background: #f7f7f7;
+  border-color: #c7c7c7;
+}
+
+.signin-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.signin-divider::before,
+.signin-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.signin-copy {
+  font-size: 0.86rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+.signin-message {
+  font-size: 0.82rem;
+  color: var(--accent-strong);
+  background: var(--bg-elevated-2);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin: 0;
+}
+
+/* --- My trees dialog --- */
+
+.trees-dialog {
+  max-width: 440px;
+}
+.trees-new-btn {
+  width: 100%;
+  margin-bottom: 14px;
+}
+.tree-list-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px 6px 4px 12px;
+  margin-bottom: 8px;
+}
+.tree-list-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  border: none;
+  background: none;
+  padding: 8px 0;
+  text-align: left;
+}
+.tree-list-name {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+.tree-list-updated {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* --- Person menu --- */
+
+.person-menu-dialog {
+  max-width: 420px;
+}
+.person-menu-name {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 2px;
+}
+.person-menu-name input[type='text'] {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 600;
+  flex: 1;
+  border: none;
+  background: none;
+  padding: 2px 0;
+}
+.person-menu-name input[type='text']:focus {
+  outline: none;
+  border-bottom: 1px solid var(--accent);
+}
+
+.menu-section {
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+}
+.menu-section:first-of-type {
+  border-top: none;
+  padding-top: 4px;
+}
+.spouse-branch-btn {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 0.95rem;
+}
+
+.menu-section-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.menu-btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.possibility-flag {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: var(--bg-elevated-2);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.8rem;
+}
+
+.sibling-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sibling-relation-row {
+  display: flex;
+  gap: 8px;
+}
+.sibling-relation-row .btn {
+  flex: 1;
+}
+.sibling-relation-row .btn.is-selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff9f0;
+}
+.sibling-checklist[hidden] {
+  display: none;
+}
+.sibling-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+.sibling-checklist label {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px !important;
+  font-size: 0.85rem !important;
+  color: var(--text) !important;
+}
+
+.danger-zone {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* --- Branch focus banner --- */
+
+.branch-focus-banner[hidden] {
+  display: none;
+}
+.branch-focus-banner {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--accent);
+  color: #fff9f0;
+  font-size: 0.82rem;
+}
+.branch-focus-banner strong {
+  font-family: var(--font-heading);
+}
+.branch-focus-back {
+  margin-left: auto;
+  border: 1px solid rgba(255, 249, 240, 0.6);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 4px 12px;
+}
+.branch-focus-back:hover {
+  background: rgba(255, 249, 240, 0.15);
+}
