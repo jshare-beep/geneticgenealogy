@@ -113,7 +113,7 @@
       text-align: center;
     }
   </style>
-  <script>(function(){var u="https://project--854d7c9d-3024-4434-879a-aad13a46cbfe.lovable.app/api/public/track",s="8efe184f-b87e-4e2d-bb24-f8f602dbb698",l,f=1;function t(){if(location.pathname===l)return;l=location.pathname;var b=JSON.stringify({s:s,p:l,r:f?document.referrer:""});f=0;navigator.sendBeacon?navigator.sendBeacon(u,b):fetch(u,{method:"POST",body:b,keepalive:true})}t();var h=history.pushState;history.pushState=function(){h.apply(this,arguments);setTimeout(t,0)};addEventListener("popstate",t)})();</script>
+  <script>(function(){var u="https://project--854d7c9d-3024-4434-879a-aad13a46cbfe.lovable.app/api/public/track",s="8efe184f-b87e-4e2d-bb24-f8f602dbb698",l,f=1;function t(){if(location.pathname===l)return;l=location.pathname;var b=JSON.stringify({s:s,p:l,r:f?document.referrer:"",q:f?location.search:""});f=0;navigator.sendBeacon?navigator.sendBeacon(u,b):fetch(u,{method:"POST",body:b,keepalive:true})}t();var h=history.pushState;history.pushState=function(){h.apply(this,arguments);setTimeout(t,0)};addEventListener("popstate",t)})();</script>
 </head>
 <body>
   <header>
